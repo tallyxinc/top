@@ -73,7 +73,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(avatarId, user, metadata, {from: owner})
+        await reputationBook.createAvatar(avatarId, user, metadata, {from: owner})
             .then(Utils.receiptShouldSucceed);
 
         let userTokenIds = await reputationBook.userTokenIds.call(user);
@@ -96,7 +96,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(avatarId, user, metadata, {from: owner})
+        await reputationBook.createAvatar(avatarId, user, metadata, {from: owner})
             .then(Utils.receiptShouldSucceed);
 
         let userTokenIds = await reputationBook.userTokenIds.call(user);
@@ -119,7 +119,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(avatarId, user, metadata, {from: accounts[5]})
+        await reputationBook.createAvatar(avatarId, user, metadata, {from: accounts[5]})
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
     });
@@ -129,7 +129,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(avatarId, 0x0, metadata, {from: owner})
+        await reputationBook.createAvatar(avatarId, 0x0, metadata, {from: owner})
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
     });
@@ -139,7 +139,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(avatarId, user, metadata, {from: owner})
+        await reputationBook.createAvatar(avatarId, user, metadata, {from: owner})
             .then(Utils.receiptShouldSucceed);
 
         let userTokenIds = await reputationBook.userTokenIds.call(user);
@@ -158,7 +158,7 @@ contract('ReputationBook', accounts => {
 
         let newAvatarId = 1235;
 
-        await reputationBook.createUser(newAvatarId, user, metadata, {from: owner})
+        await reputationBook.createAvatar(newAvatarId, user, metadata, {from: owner})
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
     });
@@ -168,7 +168,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(avatarId, user, metadata, {from: owner})
+        await reputationBook.createAvatar(avatarId, user, metadata, {from: owner})
             .then(Utils.receiptShouldSucceed);
 
         let userTokenIds = await reputationBook.userTokenIds.call(user);
@@ -188,7 +188,7 @@ contract('ReputationBook', accounts => {
         let newUser = accounts[4];
         let newMetadata = [0x13, 0x45];
 
-        await reputationBook.createUser(avatarId, newUser, newMetadata, {from: owner})
+        await reputationBook.createAvatar(avatarId, newUser, newMetadata, {from: owner})
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
     }); 
@@ -198,7 +198,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(0, user, metadata, {from: owner})
+        await reputationBook.createAvatar(0, user, metadata, {from: owner})
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
     });  
@@ -208,7 +208,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(avatarId, user, metadata, {from: owner})
+        await reputationBook.createAvatar(avatarId, user, metadata, {from: owner})
             .then(Utils.receiptShouldSucceed);
 
         let userTokenIds = await reputationBook.userTokenIds.call(user);
@@ -256,7 +256,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(avatarId, user, metadata, {from: owner})
+        await reputationBook.createAvatar(avatarId, user, metadata, {from: owner})
             .then(Utils.receiptShouldSucceed);
 
         let userTokenIds = await reputationBook.userTokenIds.call(user);
@@ -299,7 +299,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(avatarId, user, metadata, {from: owner})
+        await reputationBook.createAvatar(avatarId, user, metadata, {from: owner})
             .then(Utils.receiptShouldSucceed);
 
         let userTokenIds = await reputationBook.userTokenIds.call(user);
@@ -331,7 +331,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(avatarId, user, metadata, {from: owner})
+        await reputationBook.createAvatar(avatarId, user, metadata, {from: owner})
             .then(Utils.receiptShouldSucceed);
 
         let userTokenIds = await reputationBook.userTokenIds.call(user);
@@ -363,7 +363,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(avatarId, user, metadata, {from: owner})
+        await reputationBook.createAvatar(avatarId, user, metadata, {from: owner})
             .then(Utils.receiptShouldSucceed);
 
         let userTokenIds = await reputationBook.userTokenIds.call(user);
@@ -395,7 +395,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(avatarId, user, metadata, {from: owner})
+        await reputationBook.createAvatar(avatarId, user, metadata, {from: owner})
             .then(Utils.receiptShouldSucceed);
 
         let userTokenIds = await reputationBook.userTokenIds.call(user);
@@ -443,7 +443,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(avatarId, user, metadata, {from: owner})
+        await reputationBook.createAvatar(avatarId, user, metadata, {from: owner})
             .then(Utils.receiptShouldSucceed);
 
         let userTokenIds = await reputationBook.userTokenIds.call(user);
@@ -480,7 +480,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(avatarId, user, metadata, {from: owner})
+        await reputationBook.createAvatar(avatarId, user, metadata, {from: owner})
             .then(Utils.receiptShouldSucceed);
 
         let userTokenIds = await reputationBook.userTokenIds.call(user);
@@ -517,7 +517,7 @@ contract('ReputationBook', accounts => {
         let user = accounts[3];
         let metadata = [0x12, 0x34];
 
-        await reputationBook.createUser(avatarId, user, metadata, {from: owner})
+        await reputationBook.createAvatar(avatarId, user, metadata, {from: owner})
             .then(Utils.receiptShouldSucceed);
 
         let userTokenIds = await reputationBook.userTokenIds.call(user);

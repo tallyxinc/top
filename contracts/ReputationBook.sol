@@ -7,7 +7,7 @@ import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Token.sol';
 contract ReputationBook is ERC721Token, Ownable {
     using SafeMath for uint256;
 
-    struct User {
+    struct Avatar {
         uint256 avatarId;
         bytes metadata;
         uint256 reputation;
@@ -17,7 +17,7 @@ contract ReputationBook is ERC721Token, Ownable {
 
     mapping (address => uint256) public userAvatarIds;
 
-    mapping (uint256 => User) public reputations;
+    mapping (uint256 => Avatar) public reputations;
 
     mapping (uint256 => bool) public claimedAvatarIds;
 
@@ -76,7 +76,7 @@ contract ReputationBook is ERC721Token, Ownable {
         changeAgent[_agent] = _status;
     }
 
-    function createUser(
+    function createAvatar(
         uint256 _avatarId,
         address _user,
         bytes _metadata
@@ -96,7 +96,7 @@ contract ReputationBook is ERC721Token, Ownable {
         uint256 tokenId = allTokens.length;
         super._mint(_user, tokenId);
 
-        reputations[tokenId] = User({
+        reputations[tokenId] = Avatar({
             avatarId: _avatarId,
             metadata: _metadata,
             reputation: 0
@@ -130,7 +130,7 @@ contract ReputationBook is ERC721Token, Ownable {
     {
         require(_user != address(0));
             
-        User storage user = reputations[userTokenIds[_user]];
+        Avatar storage user = reputations[userTokenIds[_user]];
 
         require(
             _valueToAdd > 0 &&
@@ -156,7 +156,7 @@ contract ReputationBook is ERC721Token, Ownable {
         public
         onlyChangeAgents
     {
-        User storage user = reputations[userTokenIds[_user]];
+        Avatar storage user = reputations[userTokenIds[_user]];
 
         require(
             _user != address(0) &&
