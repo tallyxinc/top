@@ -1,179 +1,196 @@
 pragma solidity ^0.4.24;
 
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol'; 
-import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Token.sol'; 
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/token/ERC721/ERC721Token.sol"; 
+import "./Strings.sol";
+import "./Permissions.sol";
 
-contract ReputationBook is ERC721Token, Ownable {
+contract ReputationBook is ERC721Token, Ownable, Strings, Permissions {
     using SafeMath for uint256;
 
+    // Struct that implements Avatar (user) entity inside Tallyx system 
     struct Avatar {
-        uint256 avatarId;
-        bytes metadata;
-        uint256 reputation;
+        address userAddress;
+        string avatarId;
+        string topId;
+        string entityId;
+        bytes32 entityType;
+        string entityName;
+        string IdVerifierId;
+        string reputationScore;
+        bool created;
     }
 
-    mapping (address => uint256) public userTokenIds;
+    // Mapping from token id to hashed avatar id
+    mapping (uint256 => bytes32) public numericIdToHashedAvatarId;
 
-    mapping (address => uint256) public userAvatarIds;
+    // Mapping from hashed avatar id to token id
+    mapping (bytes32 => uint256) public hashedAvatarIdToNumericId;
 
-    mapping (uint256 => Avatar) public reputations;
+    // Mapping from token id to Avatar data
+    mapping (uint256 => Avatar) public avatars;
 
-    mapping (uint256 => bool) public claimedAvatarIds;
-
-    mapping (address => bool) private changeAgent;
-
-    modifier onlyChangeAgents() {
-        require(changeAgent[msg.sender] == true);
-        _;
-    }
-
-    event ReputationIncreased(
-        address _user,
-        address _increasedBy,
-        uint256 _pointsAdded,
-        uint256 _currentReputation,
-        uint256 _previousReputation
-    );
-
-    event ReputationDecreased(
-        address _user,
-        address _decreasedBy,
-        uint256 _pointsSubstracted,
-        uint256 _currentReputation,
-        uint256 _previousReputation
-    );
-
+    /** 
+     * @dev Constructor for ReputationBook smart contract for Tallyx system
+     * @param _name - Name for ERC721 based avatar assets
+     * @param _symbol - Symbol for ERC721 based avatar assets
+     */
     constructor(
         string _name,
         string _symbol
     ) 
         public
         ERC721Token(_name, _symbol)
+        Permissions()
     {
-        changeAgent[msg.sender] = true;
+        permissions[msg.sender] = PERMISSION_SET_PERMISSION | PERMISSION_TO_CREATE | 
+            PERMISSION_TO_MODIFY;
     }
 
-    function isChangeAgent(address _user)
-        public
-        view
-        returns (bool)
-    {
-        return changeAgent[_user];
+    /** 
+     * @dev Disallowed transferFrom function
+     */
+    function transferFrom(
+        address,
+        address,
+        uint256
+    ) public {
+        require(false, ERROR_DISALLOWED);
     }
 
-    function updateChangeAgent(
-        address _agent,
-        bool _status
-    )
-        public
-        onlyOwner
-    {
-        require(
-            _agent != address(0) &&
-            changeAgent[_agent] != _status
-        );
-        changeAgent[_agent] = _status;
+    /**
+     * @dev Disallowed approve function
+     */
+    function approve(
+        address, 
+        uint256
+    ) public {
+        require(false, ERROR_DISALLOWED);
     }
 
+    /**
+     * @dev Disallowed setApprovalForAll function
+     */
+    function setApprovalForAll(
+        address, 
+        bool
+    ) public {
+        require(false, ERROR_DISALLOWED);
+    }
+
+    /** 
+     * @dev Adds new user to registry, by minting ERC721 token extended with user metadata
+     * @param _avatarId - Unique identifier of user inside Tallyx system
+     * @param _user - Address
+     * @notice Other function params - ids inside Tallyx system
+     */
     function createAvatar(
-        uint256 _avatarId,
+        string _avatarId,
         address _user,
-        bytes _metadata
+        string _topId,
+        string _entityId,
+        bytes32 _entityType,
+        string _entityName,
+        string _IdVerifierId
     )
         public
-        onlyChangeAgents
+        hasPermission(msg.sender, PERMISSION_TO_CREATE)
         returns (bool)
     {
+        bytes32 hashedAvatarId = keccak256(bytes(_avatarId));
+        uint256 tokenId = allTokens.length.add(1);
+
         require(
             _user != address(0) &&
-            userAvatarIds[_user] == 0 &&
-            claimedAvatarIds[_avatarId] == false &&
             balanceOf(_user) == 0 &&
-            _avatarId > 0
+            numericIdToHashedAvatarId[tokenId][0] == 0 &&
+            avatars[hashedAvatarIdToNumericId[hashedAvatarId]].created == false
         );
-
-        uint256 tokenId = allTokens.length;
+        
         super._mint(_user, tokenId);
 
-        reputations[tokenId] = Avatar({
-            avatarId: _avatarId,
-            metadata: _metadata,
-            reputation: 0
-        });
+        numericIdToHashedAvatarId[tokenId] = hashedAvatarId;
+        hashedAvatarIdToNumericId[hashedAvatarId] = tokenId;
 
-        claimedAvatarIds[_avatarId] = true;
-        userAvatarIds[_user] = _avatarId;
-        userTokenIds[_user] = tokenId;
+        avatars[tokenId].userAddress = _user;
+        avatars[tokenId].avatarId = _avatarId;
+        avatars[tokenId].topId = _topId;
+        avatars[tokenId].entityId = _entityId;
+        avatars[tokenId].entityType = _entityType;
+        avatars[tokenId].entityName = _entityName;
+        avatars[tokenId].IdVerifierId = _IdVerifierId;
+        avatars[tokenId].reputationScore = "0";
+        avatars[tokenId].created = true;
 
         return true;
     }
 
-    function getReputation(address _user)
+    /**
+     * @dev Returns avatar information from registry (address,
+     * avatar reputation and avatar metadata)
+     * @param _avatarId - Unique identifier of Avatar entity inside Tallyx system
+     */
+    function getAvatar(string _avatarId)
         public
         view
-        returns (uint256)
+        returns (
+            address,
+            string,
+            string,
+            string,
+            string,
+            bytes32[2]
+        )
     {
+        bytes32 hashedAvatarId = keccak256(bytes(_avatarId));        
+        
         require(
-            _user != address(0) &&
-            userAvatarIds[_user] != 0
-        );
-        return reputations[userTokenIds[_user]].reputation;
-    }
-
-    function increaseReputation(
-        address _user,
-        uint256 _valueToAdd
-    )
-        public
-        onlyChangeAgents
-    {
-        require(_user != address(0));
-            
-        Avatar storage user = reputations[userTokenIds[_user]];
-
-        require(
-            _valueToAdd > 0 &&
-            userAvatarIds[_user] == user.avatarId
+            avatars[hashedAvatarIdToNumericId[hashedAvatarId]].created == true &&
+            numericIdToHashedAvatarId[hashedAvatarIdToNumericId[hashedAvatarId]][0] != 0 
         );
 
-        uint256 prevReputation = user.reputation;
-        user.reputation = user.reputation.add(_valueToAdd);
+        Avatar storage avatar = avatars[hashedAvatarIdToNumericId[hashedAvatarId]];
+        bytes32[2] memory avatarSymbolicData;
+        
+        avatarSymbolicData[0] = toBytes32(avatar.reputationScore);
+        avatarSymbolicData[1] = avatar.entityType;
 
-        emit ReputationIncreased(
-            _user,
-            msg.sender,
-            _valueToAdd,
-            user.reputation,
-            prevReputation
+        return (
+            avatar.userAddress,
+            avatar.topId,
+            avatar.entityId,
+            avatar.IdVerifierId,
+            avatar.entityName,
+            avatarSymbolicData
         );
     }
 
-    function decreaseReputation(
-        address _user,
-        uint256 _valueToSub
+    /**
+     * @dev Updates user(avatar) reputation and hashed metadata in registry 
+     * @param _avatarId - Unique identifier of avatar entity
+     * @param _newReputationScore - New reputation score
+     */
+    function updateReputationScore(
+        string _avatarId,
+        string _newReputationScore
     )
         public
-        onlyChangeAgents
+        hasPermission(msg.sender, PERMISSION_TO_MODIFY)
+        returns (bool)
     {
-        Avatar storage user = reputations[userTokenIds[_user]];
+        bytes32 hashedAvatarId = keccak256(bytes(_avatarId));
 
         require(
-            _user != address(0) &&
-            _valueToSub > 0 &&
-            _valueToSub <= user.reputation &&
-            userAvatarIds[_user] == user.avatarId
+            avatars[hashedAvatarIdToNumericId[hashedAvatarId]].created == true &&
+            numericIdToHashedAvatarId[hashedAvatarIdToNumericId[hashedAvatarId]][0] != 0 &&
+            exists(hashedAvatarIdToNumericId[hashedAvatarId]) == true &&
+            ownerOf(hashedAvatarIdToNumericId[hashedAvatarId]) == 
+                avatars[hashedAvatarIdToNumericId[hashedAvatarId]].userAddress
         );
 
-        uint256 prevReputation = user.reputation;
-        user.reputation = user.reputation.sub(_valueToSub);
-
-        emit ReputationDecreased(
-            _user,
-            msg.sender,
-            _valueToSub,
-            user.reputation,
-            prevReputation
-        );
+        Avatar storage avatar = avatars[hashedAvatarIdToNumericId[hashedAvatarId]];
+        avatar.reputationScore = _newReputationScore;
+        return true;
     }
 }
