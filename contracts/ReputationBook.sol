@@ -6,6 +6,7 @@ import "openzeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
 import "./Strings.sol";
 import "./Permissions.sol";
 
+
 contract ReputationBook is ERC721Token, Ownable, Strings, Permissions {
     using SafeMath for uint256;
 
@@ -44,8 +45,8 @@ contract ReputationBook is ERC721Token, Ownable, Strings, Permissions {
         ERC721Token(_name, _symbol)
         Permissions()
     {
-        permissions[msg.sender] = PERMISSION_SET_PERMISSION | PERMISSION_TO_CREATE | 
-            PERMISSION_TO_MODIFY;
+        permissions[msg.sender] = PERMISSION_SET_PERMISSION | 
+            PERMISSION_TO_CREATE | PERMISSION_TO_MODIFY;
     }
 
     /** 
@@ -101,8 +102,8 @@ contract ReputationBook is ERC721Token, Ownable, Strings, Permissions {
         bytes32 hashedAvatarId = keccak256(bytes(_avatarId));
         uint256 tokenId = allTokens.length.add(1);
 
+        require(_user != address(0), ERROR_ZERO_ADDRESS);
         require(
-            _user != address(0) &&
             balanceOf(_user) == 0 &&
             numericIdToHashedAvatarId[tokenId][0] == 0 &&
             avatars[hashedAvatarIdToNumericId[hashedAvatarId]].created == false
@@ -146,11 +147,14 @@ contract ReputationBook is ERC721Token, Ownable, Strings, Permissions {
         bytes32 hashedAvatarId = keccak256(bytes(_avatarId));        
         
         require(
-            avatars[hashedAvatarIdToNumericId[hashedAvatarId]].created == true &&
-            numericIdToHashedAvatarId[hashedAvatarIdToNumericId[hashedAvatarId]][0] != 0 
+            avatars[hashedAvatarIdToNumericId[hashedAvatarId]].created == true
+            &&
+            numericIdToHashedAvatarId
+            [hashedAvatarIdToNumericId[hashedAvatarId]][0] != 0
         );
 
-        Avatar storage avatar = avatars[hashedAvatarIdToNumericId[hashedAvatarId]];
+        Avatar storage avatar = 
+            avatars[hashedAvatarIdToNumericId[hashedAvatarId]];
         bytes32[2] memory avatarSymbolicData;
         
         avatarSymbolicData[0] = toBytes32(avatar.reputationScore);
@@ -182,14 +186,17 @@ contract ReputationBook is ERC721Token, Ownable, Strings, Permissions {
         bytes32 hashedAvatarId = keccak256(bytes(_avatarId));
 
         require(
-            avatars[hashedAvatarIdToNumericId[hashedAvatarId]].created == true &&
-            numericIdToHashedAvatarId[hashedAvatarIdToNumericId[hashedAvatarId]][0] != 0 &&
+            avatars[hashedAvatarIdToNumericId[hashedAvatarId]].created == true
+            &&
+            numericIdToHashedAvatarId
+            [hashedAvatarIdToNumericId[hashedAvatarId]][0] != 0 &&
             exists(hashedAvatarIdToNumericId[hashedAvatarId]) == true &&
             ownerOf(hashedAvatarIdToNumericId[hashedAvatarId]) == 
                 avatars[hashedAvatarIdToNumericId[hashedAvatarId]].userAddress
         );
 
-        Avatar storage avatar = avatars[hashedAvatarIdToNumericId[hashedAvatarId]];
+        Avatar storage avatar = 
+            avatars[hashedAvatarIdToNumericId[hashedAvatarId]];
         avatar.reputationScore = _newReputationScore;
         return true;
     }

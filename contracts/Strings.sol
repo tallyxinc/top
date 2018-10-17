@@ -1,5 +1,6 @@
 pragma solidity ^0.4.24;
 
+
 contract Strings {
     /**
      * @dev Converts int256 to string
@@ -52,7 +53,7 @@ contract Strings {
         if (bytesString.length == 0) {
             return 0x0;
         }
-
+        /* solium-disable-next-line */
         assembly {
             result := mload(add(source, 32))
         }

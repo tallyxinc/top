@@ -1,8 +1,8 @@
 {
-  "name": "smart-contract-templates",
+  "name": "reputation-book",
   "version": "1.0.0",
-  "description": "Smart Contract templates",
-  "homepage": "https://bitbucket.org/applicature/solidity.project-template#readme",
+  "description": "Reputation Book",
+  "homepage": "https://github.com/tallyxinc/top-reputation-book/blob/master/README.md",
   "license": "UNLICENSED",
   "keywords": [
     "solidity",
@@ -12,7 +12,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://bitbucket.org/applicature/solidity.smart-contract-templates.git"
+    "url": "git+https://github.com/tallyxinc/top-reputation-book.git"
   },
   "author": "Andrew Zubko <andrew@applicature.com>",
   "engines": {
