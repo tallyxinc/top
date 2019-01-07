@@ -32,6 +32,25 @@ contract ReputationBook is ERC721Token, Ownable, Strings, Permissions {
     // Mapping from token id to Avatar data
     mapping (uint256 => Avatar) public avatars;
 
+    /**
+     * @dev Emits when avatar is created
+     */
+    event AvatarCreated(
+        string _avatarId,
+        string _topId,
+        address _userAddress,
+        string _reputationScore
+    );
+
+
+    /**
+     * @dev Emits when reputation score of avatar is updated
+     */
+    event ReputationScoreUpdated(
+        string _avatarId,
+        string _reputationScore
+    );
+
     /** 
      * @dev Constructor for ReputationBook smart contract for Tallyx system
      * @param _name - Name for ERC721 based avatar assets
@@ -124,6 +143,12 @@ contract ReputationBook is ERC721Token, Ownable, Strings, Permissions {
         avatars[tokenId].reputationScore = "0";
         avatars[tokenId].created = true;
 
+        emit AvatarCreated(
+            _avatarId,
+            _topId,
+            _user,
+            avatars[tokenId].reputationScore
+        );
         return true;
     }
 
@@ -198,6 +223,11 @@ contract ReputationBook is ERC721Token, Ownable, Strings, Permissions {
         Avatar storage avatar = 
             avatars[hashedAvatarIdToNumericId[hashedAvatarId]];
         avatar.reputationScore = _newReputationScore;
+
+        emit ReputationScoreUpdated(
+            _avatarId,
+            _newReputationScore
+        );
         return true;
     }
 }

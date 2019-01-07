@@ -16,7 +16,7 @@ contract('ReputationBook', accounts => {
     beforeEach(async () => {
         let name = "TallyxReputationBook";
         let symbol = "TLX";
-        reputationBook = await ReputationBook.new(name, symbol, {from: owner});
+        reputationBook = await ReputationBook.new(name, symbol, { from: owner });
     });
 
     it('should check metadata', async () => {
@@ -32,7 +32,7 @@ contract('ReputationBook', accounts => {
         assert.equal(balanceOf.valueOf(), new BigNumber('0').valueOf(), "balanceOf is not equal");
     });
 
-    it('should check that owner has permission to create avatar and modify avatar', async() => {
+    it('should check that owner has permission to create avatar and modify avatar', async () => {
         let permissionSet = await reputationBook.permissions.call(owner);
         assert.equal(new BigNumber(permissionSet).valueOf(), new BigNumber('7').valueOf(), "permissions are not equal");
     });
@@ -43,7 +43,7 @@ contract('ReputationBook', accounts => {
     });
 
     it('should update permission for avatar creating', async () => {
-        await reputationBook.setPermission(allowedAddress, 2, {from: owner})
+        await reputationBook.setPermission(allowedAddress, 2, { from: owner })
             .then(Utils.receiptShouldSucceed);
 
         let permissionSet = await reputationBook.permissions.call(allowedAddress);
@@ -51,7 +51,7 @@ contract('ReputationBook', accounts => {
     });
 
     it('should not update permission for avatar creating cause _address == address(0)', async () => {
-        await reputationBook.setPermission(0x0, 2, {from: owner})
+        await reputationBook.setPermission(0x0, 2, { from: owner })
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
 
@@ -60,7 +60,7 @@ contract('ReputationBook', accounts => {
     });
 
     it('should not update permission for avatar creating cause msg.sender != owner', async () => {
-        await reputationBook.setPermission(allowedAddress, 2, {from: accounts[2]})
+        await reputationBook.setPermission(allowedAddress, 2, { from: accounts[2] })
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
 
@@ -69,7 +69,7 @@ contract('ReputationBook', accounts => {
     });
 
     it('should update permission for avatar creating', async () => {
-        await reputationBook.setPermission(allowedAddress, 4, {from: owner})
+        await reputationBook.setPermission(allowedAddress, 4, { from: owner })
             .then(Utils.receiptShouldSucceed);
 
         let permissionSet = await reputationBook.permissions.call(allowedAddress);
@@ -77,7 +77,7 @@ contract('ReputationBook', accounts => {
     });
 
     it('should not update permission for avatar creating cause _address == address(0)', async () => {
-        await reputationBook.setPermission(0x0, 4, {from: owner})
+        await reputationBook.setPermission(0x0, 4, { from: owner })
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
 
@@ -86,7 +86,7 @@ contract('ReputationBook', accounts => {
     });
 
     it('should not update permission for avatar creating cause msg.sender != owner', async () => {
-        await reputationBook.setPermission(allowedAddress, 4, {from: accounts[2]})
+        await reputationBook.setPermission(allowedAddress, 4, { from: accounts[2] })
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
 
@@ -111,9 +111,22 @@ contract('ReputationBook', accounts => {
             entityType,
             entityName,
             IdVerifierId,
-            {from: owner}
+            { from: owner }
         )
             .then(Utils.receiptShouldSucceed);
+
+        let events = await reputationBook.AvatarCreated({}, { fromBlock: '0', toBlock: 'latest' });
+
+        events.get((err, logs) => {
+            assert.equal(logs.length, 1, "were emitted less or more than 1 event");
+            assert.equal(logs[0].event, "AvatarCreated", "event type is not equal");
+            assert.equal(logs[0].args._avatarId, avatarId, "avatarId is not equal");
+            assert.equal(logs[0].args._topId, topId, "topId is not equal");
+            assert.equal(logs[0].args._userAddress, user, "user is not equal");
+            assert.equal(logs[0].args._reputationScore, '0', "reputation score is not equal");
+
+            logs.forEach(log => console.log(log.args));
+        });
     });
 
     it('should create avatar', async () => {
@@ -133,9 +146,23 @@ contract('ReputationBook', accounts => {
             entityType,
             entityName,
             IdVerifierId,
-            {from: owner}
+            { from: owner }
         )
             .then(Utils.receiptShouldSucceed);
+
+        let events = await reputationBook.AvatarCreated({}, { fromBlock: '0', toBlock: 'latest' });
+
+        events.get((err, logs) => {
+            assert.equal(logs.length, 1, "were emitted less or more than 1 event");
+            assert.equal(logs[0].event, "AvatarCreated", "event type is not equal");
+            assert.equal(logs[0].args._avatarId, avatarId, "avatarId is not equal");
+            assert.equal(logs[0].args._topId, topId, "topId is not equal");
+            assert.equal(logs[0].args._userAddress, user, "user is not equal");
+            assert.equal(logs[0].args._reputationScore, '0', "reputation score is not equal");
+
+            logs.forEach(log => console.log(log.args));
+        });
+
     });
 
     it('should not create avatar cause msg.sender != allowed avatar creator', async () => {
@@ -155,7 +182,7 @@ contract('ReputationBook', accounts => {
             entityType,
             entityName,
             IdVerifierId,
-            {from: accounts[2]}
+            { from: accounts[2] }
         )
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
@@ -178,7 +205,7 @@ contract('ReputationBook', accounts => {
             entityType,
             entityName,
             IdVerifierId,
-            {from: owner}
+            { from: owner }
         )
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
@@ -193,7 +220,7 @@ contract('ReputationBook', accounts => {
         let entityName = "Xi-Wong Trading";
         let IdVerifierId = "034dfcf3-066a-459b-ab62-3b8dbfa0ca76";
 
-         await reputationBook.createAvatar(
+        await reputationBook.createAvatar(
             avatarId,
             user,
             topId,
@@ -201,7 +228,7 @@ contract('ReputationBook', accounts => {
             entityType,
             entityName,
             IdVerifierId,
-            {from: owner}
+            { from: owner }
         )
             .then(Utils.receiptShouldSucceed);
 
@@ -213,7 +240,7 @@ contract('ReputationBook', accounts => {
             entityType,
             entityName,
             IdVerifierId,
-            {from: owner}
+            { from: owner }
         )
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
@@ -228,7 +255,7 @@ contract('ReputationBook', accounts => {
         let entityName = "Xi-Wong Trading";
         let IdVerifierId = "034dfcf3-066a-459b-ab62-3b8dbfa0ca76";
 
-         await reputationBook.createAvatar(
+        await reputationBook.createAvatar(
             avatarId,
             user,
             topId,
@@ -236,7 +263,7 @@ contract('ReputationBook', accounts => {
             entityType,
             entityName,
             IdVerifierId,
-            {from: owner}
+            { from: owner }
         )
             .then(Utils.receiptShouldSucceed);
 
@@ -266,7 +293,7 @@ contract('ReputationBook', accounts => {
         let entityName = "Xi-Wong Trading";
         let IdVerifierId = "034dfcf3-066a-459b-ab62-3b8dbfa0ca76";
 
-         await reputationBook.createAvatar(
+        await reputationBook.createAvatar(
             avatarId,
             user,
             topId,
@@ -274,7 +301,7 @@ contract('ReputationBook', accounts => {
             entityType,
             entityName,
             IdVerifierId,
-            {from: owner}
+            { from: owner }
         )
             .then(Utils.receiptShouldSucceed);
 
@@ -287,7 +314,19 @@ contract('ReputationBook', accounts => {
         // assert.equal(avatar[2], entityId, "entityId is not equal");
         // assert.equal(avatar[3], IdVerifierId, "IdVerifierId is not equal");
 
-        // assert.equal(web3.toAscii(avatar[4][0])[0], "2", "reputationScore is not equal");        
+        // assert.equal(web3.toAscii(avatar[4][0])[0], "2", "reputationScore is not equal");  
+
+
+        let events = await reputationBook.ReputationScoreUpdated({}, { fromBlock: '0', toBlock: 'latest' });
+
+        events.get((err, logs) => {
+            assert.equal(logs.length, 1, "were emitted less or more than 1 event");
+            assert.equal(logs[0].event, "ReputationScoreUpdated", "event type is not equal");
+            assert.equal(logs[0].args._reputationScore, '2', "reputation score is not equal");
+
+            logs.forEach(log => console.log(log.args));
+        });
+
     });
 
     it('should not update avatar reputation score cause there are not such avatar', async () => {
@@ -299,7 +338,7 @@ contract('ReputationBook', accounts => {
         let entityName = "Xi-Wong Trading";
         let IdVerifierId = "034dfcf3-066a-459b-ab62-3b8dbfa0ca76";
 
-         await reputationBook.createAvatar(
+        await reputationBook.createAvatar(
             avatarId,
             user,
             topId,
@@ -307,12 +346,12 @@ contract('ReputationBook', accounts => {
             entityType,
             entityName,
             IdVerifierId,
-            {from: owner}
+            { from: owner }
         )
             .then(Utils.receiptShouldSucceed);
 
-        await reputationBook.updateReputationScore("123123", "2", {from: owner})
-            .then(Utils.receiptShouldFailed)    
+        await reputationBook.updateReputationScore("123123", "2", { from: owner })
+            .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
 
         let avatar = await reputationBook.getAvatar(avatarId);
@@ -321,6 +360,6 @@ contract('ReputationBook', accounts => {
         assert.equal(avatar[2], entityId, "entityId is not equal");
         assert.equal(avatar[3], IdVerifierId, "IdVerifierId is not equal");
 
-        assert.equal(web3.toAscii(avatar[5][0])[0], "0", "reputationScore is not equal");        
+        assert.equal(web3.toAscii(avatar[5][0])[0], "0", "reputationScore is not equal");
     });
 });
